@@ -14,70 +14,6 @@ let guessedWord = createGuessList(word.length);
 let wrongGuesses = [];
 let isGameOver = false;
 
-async function chooseLanguage() {
-
-    const availableLanguages = Object.keys(dictionary); 
-    const languagePrompt = dictionary.languageChoices;
-
-    let languageCode = await rl.question(languagePrompt);
-    languageCode = languageCode.toLowerCase();
- 
-    if (!availableLanguages.includes(languageCode)) {
-        print("Ikke gyldig. Velger norsk.");
-        return dictionary.no;
-    }
-
-    return dictionary[languageCode];
-}
-
-function uppdateGuessedWord(guess) {
-    for (let i = 0; i < word.length; i++) {
-        if (word[i] == guess) {
-            guessedWord[i] = guess;
-        }
-    }
-}
-
-function createGuessList(length) {
-    let output = [];
-    for (let i = 0; i < length; i++) {
-        output[i] = "_";
-    }
-    return output;
-}
-
-function isWordGuessed(correct, guess) {
-    for (let i = 0; i < correct.length; i++) {
-        if (correct[i] != guess[i]) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-function print(msg, color = WHITE) {
-    console.log(color, msg, RESET);
-}
-
-function updateUI() {
-
-    console.clear();
-    print(language.currentWord + guessedWord.join(" "), GREEN);
-    print(HANGMAN_UI[wrongGuesses.length]);
-    if (wrongGuesses.length > 0) {
-        print("\n" + language.wrongGuesses + RED + wrongGuesses.join(", ") + RESET);
-    }
-}
-
-function getRandomWord() {
-
-    const words = ["Kiwi", "Car", "Dog", "etwas"];
-    let index = Math.floor(Math.random() * words.length); //Fjernet -1. Forskjell?
-    return words[index].toLowerCase();
-
-}
-
 console.clear();
 
 let language = await chooseLanguage();
@@ -87,7 +23,7 @@ await new Promise(resolve => setTimeout(resolve, 1500));
 console.clear();
 
 print(splash, RED);
-await new Promise(resolve => setTimeout(resolve, 3000));
+await new Promise(resolve => setTimeout(resolve, 2000));
 
 console.clear();
 
@@ -118,13 +54,15 @@ do {
 
     let guess = (await rl.question(language.guessPrompt)).toLowerCase();
 
+    if (wrongGuesses.includes(guess) || guessedWord.includes(guess)) {
+        continue;
+    }
+
     if (isWordGuessed(word, guess)) {
         print(language.winCelebration, GREEN);
         isGameOver = true;
-    }
-    else if (word.includes(guess)) {
-
-        uppdateGuessedWord(guess);
+    } else if (word.includes(guess)) {
+        updateGuessedWord(guess);
 
         if (isWordGuessed(word, guessedWord)) {
             print(language.winCelebration, GREEN);
@@ -133,14 +71,72 @@ do {
     } else {
         wrongGuesses.push(guess);
 
-        if (wrongGuesses.length >= HANGMAN_UI.length - 1) {
-            isGameOver = true;
+        if (wrongGuesses.length >= HANGMAN_UI.length) {
             print(language.deathRattle, RED);
+            isGameOver = true;
         }
-
     }
-
-} while (isGameOver == false)
+} while (!isGameOver)
 
 process.exit();
 
+async function chooseLanguage() {
+
+    const availableLanguages = Object.keys(dictionary); 
+
+    let languageCode = (await rl.question(dictionary.languageChoices)).toLowerCase();
+
+    return availableLanguages.includes(languageCode)
+        ? dictionary[languageCode]
+        : (print("Ikke gyldig. Velger norsk."), dictionary.no)
+}
+
+function updateUI() {
+
+    console.clear();
+
+    print(language.currentWord + guessedWord.join(" "), GREEN);
+    print(HANGMAN_UI[wrongGuesses.length]);
+
+    if (wrongGuesses.length > 0) {
+        print(language.wrongGuesses + RED + wrongGuesses.join(", ") + RESET);
+    }
+}
+
+function getRandomWord() {
+
+    const words = ["Kiwi", "Car", "Dog", "etwas"];
+    let index = Math.floor(Math.random() * words.length); //Fjernet -1. Forskjell?
+    return words[index].toLowerCase();
+
+}
+
+function updateGuessedWord(guess) {
+    for (let i = 0; i < word.length; i++) {
+        if (word[i] == guess) {
+            guessedWord[i] = guess;
+        }
+    }
+}
+
+function createGuessList(length) {
+    let output = [];
+    for (let i = 0; i < length; i++) {
+        output[i] = "_";
+    }
+    return output;
+}
+
+function isWordGuessed(correct, guess) {
+    for (let i = 0; i < correct.length; i++) {
+        if (correct[i] != guess[i]) {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+function print(msg, color = WHITE) {
+    console.log(color, msg, RESET);
+}

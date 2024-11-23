@@ -1,7 +1,7 @@
 const dictionary = {
-    languageChoices: "Norsk(no) / English(en) / Français(fr): ",
+    languageChoices: "Norsk(1) / English(2) / Français(3): ",
     
-    no: {
+    1: {
         selectedLanguage: "Valgt språk er norsk.",
         wrongGuesses: "Feil gjetninger: ",
         guessPrompt: "Gjett en bokstav eller ord: ",
@@ -16,7 +16,7 @@ const dictionary = {
         exitMessage: "Far vel."
         },
 
-    en: {
+    2: {
         selectedLanguage: "Selected language is english.",
         wrongGuesses: "Wrong guesses: ",
         guessPrompt: "Guess a letter or word: ",
@@ -31,7 +31,7 @@ const dictionary = {
         exitMessage: "Thanks for playing! Goodbye."
         },
 
-    fr: {
+    3: {
         selectedLanguage: "La langue sélectionnée est le français.",
         wrongGuesses: "De fausses suppositions: ",
         guessPrompt: "Devinez une lettre ou un mot: ",
