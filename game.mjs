@@ -35,19 +35,6 @@ if (menuChoice === '1') {
         process.exit();
 }
 
-async function showMenu(language) {
-    print(language.menuStartGame);
-    print(language.menuExit);
-
-    while (true) {
-        const choice = await rl.question(language.menuPrompt);
-        if (choice === '1' || choice === '2') {
-            return choice;
-        }
-        print(language.invalidMenuChoice);
-    }
-}
-
 do {
 
     updateUI();
@@ -71,12 +58,21 @@ do {
     } else {
         wrongGuesses.push(guess);
 
-        if (wrongGuesses.length >= HANGMAN_UI.length) {
+        if (wrongGuesses.length >= HANGMAN_UI.length - 1 ) {
+            updateUI();
             print(language.deathRattle, RED);
             isGameOver = true;
         }
     }
 } while (!isGameOver)
+
+await new Promise(resolve => setTimeout(resolve, 2000));
+
+console.clear();
+
+print("\n" + language.correctWord + word, GREEN);
+print("\n" + language.wrongGuessAmount + wrongGuesses.length, RED);
+print("\n" + language.exitMessage + "\n");
 
 process.exit();
 
@@ -88,7 +84,20 @@ async function chooseLanguage() {
 
     return availableLanguages.includes(languageCode)
         ? dictionary[languageCode]
-        : (print("Ikke gyldig. Velger norsk."), dictionary.no)
+        : (print(language.notAvailable), dictionary.en)
+}
+
+async function showMenu(language) {
+    print(language.menuStartGame);
+    print(language.menuExit);
+
+    while (true) {
+        const choice = await rl.question(language.menuPrompt);
+        if (choice === '1' || choice === '2') {
+            return choice;
+        }
+        print(language.invalidMenuChoice);
+    }
 }
 
 function updateUI() {
@@ -106,7 +115,7 @@ function updateUI() {
 function getRandomWord() {
 
     const words = ["Kiwi", "Car", "Dog", "etwas"];
-    let index = Math.floor(Math.random() * words.length); //Fjernet -1. Forskjell?
+    let index = Math.floor(Math.random() * words.length); 
     return words[index].toLowerCase();
 
 }
